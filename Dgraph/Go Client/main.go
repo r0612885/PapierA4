@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	// "encoding/json"
 	"fmt"
 	"log"
 
@@ -45,9 +44,9 @@ func main() {
 
 	ctx := context.Background()
 
-	// CreateQuery(ctx, dg)
-	// SearchQuery(ctx, dg)
-	DeleteQuery(ctx, dg, "0x21")
+	CreateQuery(ctx, dg)
+	SearchQuery(ctx, dg)
+	// DeleteQuery(ctx, dg, "0x21")
 	SearchQuery(ctx, dg)
 }
 
@@ -97,7 +96,7 @@ func CreateQuery(ctx context.Context, dg *dgo.Dgraph) {
 
 	u := User{
 		Uid:  "_:user",
-		Name: "Din Vanwezemael",
+		Name: "Wesley Monten",
 		Role: "Admin",
 		Voertuig: Voertuig{
 			Type:      "Heftruck A978",
