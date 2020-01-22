@@ -1,0 +1,21 @@
+			name: string @index(exact) .
+			role: string .
+			needsservice: bool .
+			type: string .
+			latitude: float .
+			longitude: float .
+
+			type Service {
+				needsservice
+			}
+
+			type Voertuig {
+				type
+				latitude
+				longitude
+			}
+
+			type User {
+				name
+				role
+			}
