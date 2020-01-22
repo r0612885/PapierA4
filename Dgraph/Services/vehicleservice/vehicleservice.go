@@ -17,11 +17,11 @@ type Vehicle struct {
 	Type      string  `json:"type,omitempty"`
 	Latitude  float64 `json:"latitude,omitempty"`
 	Longitude float64 `json:"longitude,omitempty"`
-	Needsservice bool   `json:"needsservice,omitempty"`	
+	Needsservice bool   `json:"needsservice"`	
 }
 
 // CreateVehicle creates a vehicle
-func CreateVehicle() {
+func CreateVehicle(v Vehicle) {
 
 	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
@@ -36,14 +36,6 @@ func CreateVehicle() {
 
 	txn := dg.NewTxn()
 	defer txn.Discard(ctx)
-
-	v := Vehicle{
-		Uid:       "_:vehicle",
-		Type:      "Heftruck A978",
-		Latitude:  41.1551,
-		Longitude: 49.1255,
-		Needsservice: false,
-	}
 
 	mu := &api.Mutation{
 		CommitNow: true,
@@ -85,7 +77,7 @@ func CreateVehicle() {
 
 
 // UpdateVehicle updates a vehicle
-func UpdateVehicle(id string) {
+func UpdateVehicle(id string, v Vehicle) {
 
 	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
@@ -98,7 +90,7 @@ func UpdateVehicle(id string) {
 
 	ctx := context.Background()
 
-	pb, err := json.Marshal(Vehicle{Uid: id, Type: "Vrachtwagen F468", Latitude: 25.6415, Longitude: 49.1423, Needsservice: true})
+	pb, err := json.Marshal(Vehicle{Uid: id, Type: v.Type, Latitude: v.Latitude, Longitude: v.Longitude, Needsservice: v.Needsservice})
 	if err != nil {
 		log.Fatal(err)
 	}

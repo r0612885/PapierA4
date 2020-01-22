@@ -5,14 +5,11 @@
 			latitude: float .
 			longitude: float .
 
-			type Service {
-				needsservice
-			}
-
 			type Voertuig {
 				type
 				latitude
 				longitude
+				needsservice
 			}
 
 			type User {

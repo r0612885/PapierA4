@@ -16,7 +16,7 @@ type Vehicle struct {
 	Type      string  `json:"type,omitempty"`
 	Latitude  float64 `json:"latitude,omitempty"`
 	Longitude float64 `json:"longitude,omitempty"`
-	Needsservice bool   `json:"needsservice,omitempty"`
+	Needsservice bool   `json:"needsservice"`
 }
 
 type User struct {
@@ -27,7 +27,7 @@ type User struct {
 }
 
 // CreateUser creates a user
-func CreateUser() {
+func CreateUser(u User) {
 
 	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
@@ -43,11 +43,6 @@ func CreateUser() {
 	txn := dg.NewTxn()
 	defer txn.Discard(ctx)
 
-	u := User{
-		Uid:  "_:user",
-		Name: "Wesley Monten",
-		Role: "Admin",
-	}
 
 	mu := &api.Mutation{
 		CommitNow: true,
@@ -92,7 +87,7 @@ func CreateUser() {
 }
 
 // UpdateUser updates a user
-func UpdateUser(id string) {
+func UpdateUser(id string, u User) {
 
 	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
@@ -105,7 +100,7 @@ func UpdateUser(id string) {
 
 	ctx := context.Background()
 
-	pb, err := json.Marshal(User{Uid: id, Name: "Nick Wouters", Role: "Admin"})
+	pb, err := json.Marshal(User{Uid: id, Name: u.Name, Role: u.Role})
 	if err != nil {
 		log.Fatal(err)
 	}
