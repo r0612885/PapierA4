@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/r0612885/PapierA4/InfluxDB/Services/locationservice"
 )
 
@@ -12,6 +14,10 @@ func main() {
 	metric := locationservice.CreateMockMetric(location)
 
 	locationservice.WriteRow(client, metric)
+
+	res := locationservice.ReadLocationOfUser(client, "0xa1")
+
+	fmt.Println(res)
 
 	locationservice.Exit(client)
 

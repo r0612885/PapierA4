@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
-	"github.com/influxdata/influxdb-client-go"
+	influxdb "github.com/influxdata/influxdb-client-go"
 )
 
 type Location struct {
@@ -52,4 +53,28 @@ func Init() (_influx *influxdb.Client) {
 	}
 
 	return _influx
+}
+
+func ReadLocationOfUser(_influx *influxdb.Client, _uid string) *influxdb.QueryCSVResult {
+	var timeStop = strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
+	var tmp = time.Now().AddDate(0, -1, 0)
+	var timeStart = strconv.FormatInt(tmp.UTC().UnixNano(), 10)
+
+	var query string = `from(bucket: "tracking")  |> range(start: ` + timeStart + `, stop: ` + timeStop + `)  |> filter(fn: (r) => r._measurement == "location")  |> filter(fn: (r) => r.Uid == "` + _uid + `")  |> last()`
+
+	fmt.Println(timeStart)
+	fmt.Println(timeStop)
+
+	result, err := _influx.QueryCSV(
+		context.Background(),
+		query,
+		"papierA4",
+	)
+
+	fmt.Println(result)
+
+	if err != nil {
+		panic(err)
+	}
+	return result
 }
