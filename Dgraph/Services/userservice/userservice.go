@@ -2,8 +2,8 @@ package userservice
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
+	// "encoding/json"
+
 	"log"
 
 	"github.com/dgraph-io/dgo/v2"
@@ -12,22 +12,22 @@ import (
 )
 
 type Vehicle struct {
-	Uid       string  `json:"uid,omitempty"`
-	Type      string  `json:"type,omitempty"`
-	Latitude  float64 `json:"latitude,omitempty"`
-	Longitude float64 `json:"longitude,omitempty"`
-	Needsservice bool   `json:"needsservice"`
+	Uid          string  `json:"uid,omitempty"`
+	Type         string  `json:"type,omitempty"`
+	Latitude     float64 `json:"latitude,omitempty"`
+	Longitude    float64 `json:"longitude,omitempty"`
+	Needsservice bool    `json:"needsservice"`
 }
 
 type User struct {
-	Uid      string   `json:"uid,omitempty"`
-	Name     string   `json:"name,omitempty"`
-	Role     string   `json:"role,omitempty"`
-	Vehicle  Vehicle  `json:"vehicle,omitempty"`
+	Uid     string  `json:"uid,omitempty"`
+	Name    string  `json:"name,omitempty"`
+	Role    string  `json:"role,omitempty"`
+	Vehicle Vehicle `json:"vehicle,omitempty"`
 }
 
-// CreateUser creates a user
-func CreateUser(u User) {
+// GetUsers gets all users
+func GetUsers() string {
 
 	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
@@ -43,51 +43,32 @@ func CreateUser(u User) {
 	txn := dg.NewTxn()
 	defer txn.Discard(ctx)
 
-
-	mu := &api.Mutation{
-		CommitNow: true,
-	}
-	pb, err := json.Marshal(u)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	mu.SetJson = pb
-	assigned, err := dg.NewTxn().Mutate(ctx, mu)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	variables := map[string]string{"$id": assigned.Uids["user"]}
-	q := `query getUser($id: string){
-		user(func: uid($id)){
-			name
-			role
-			vehicle {
-				type
-				latitude
-				longitude
-				needsservice
-			}
+	q := `
+	{
+		users(func: has(name)) {
+	      uid
+		  name
+		  role
+		  vehicle {
+			  type
+			  latitude
+			  longitude
+			  needsservice
+		  }
 		}
 	}`
 
-	resp, err := dg.NewTxn().QueryWithVars(ctx, q, variables)
+	res, err := txn.Query(ctx, q)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = json.Unmarshal(resp.Json, &u)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(string(resp.Json))
-
+	return string(res.Json)
 }
 
-// UpdateUser updates a user
-func UpdateUser(id string, u User) {
+// GetUser gets a user
+func GetUser(id string) string {
 
 	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
@@ -100,15 +81,100 @@ func UpdateUser(id string, u User) {
 
 	ctx := context.Background()
 
-	pb, err := json.Marshal(User{Uid: id, Name: u.Name, Role: u.Role})
+	variables := map[string]string{"$id": id}
+	q := `query getUser($id: string){
+		user(func: uid($id)){
+			uid
+			name
+			role
+			vehicle {
+				type
+				latitude
+				longitude
+				needsservice
+			}
+		}
+	}`
+
+	res, err := dg.NewTxn().QueryWithVars(ctx, q, variables)
+	if err != nil || res == nil {
+		log.Fatal(err)
+	}
+
+	return string(res.Json)
+}
+
+// CreateUser creates a user
+func CreateUser(u string) string {
+
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	if err != nil {
+		log.Fatal("While trying to dial gRPC")
+	}
+	defer conn.Close()
+
+	dc := api.NewDgraphClient(conn)
+	dg := dgo.NewDgraphClient(dc)
+
+	ctx := context.Background()
+
+	txn := dg.NewTxn()
+	defer txn.Discard(ctx)
+
+	mu := &api.Mutation{
+		CommitNow: true,
+		SetJson:   []byte(u),
+	}
+
+	assigned, err := dg.NewTxn().Mutate(ctx, mu)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	variables := map[string]string{"$id": assigned.Uids["user"]}
+	q := `query getUser($id: string){
+		user(func: uid($id)){
+			uid
+			name
+			role
+			vehicle {
+				type
+				latitude
+				longitude
+				needsservice
+			}
+		}
+	}`
+
+	res, err := dg.NewTxn().QueryWithVars(ctx, q, variables)
+	if err != nil || res == nil {
+		log.Fatal(err)
+	}
+
+	return string(res.Json)
+}
+
+// UpdateUser updates a user
+func UpdateUser(id string, u string) string {
+
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	if err != nil {
+		log.Fatal("While trying to dial gRPC")
+	}
+	defer conn.Close()
+
+	dc := api.NewDgraphClient(conn)
+	dg := dgo.NewDgraphClient(dc)
+
+	ctx := context.Background()
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	req := &api.Request{CommitNow: true}
 
-	mu := &api.Mutation{SetJson: pb}
-	mu.SetJson = pb
+	mu := &api.Mutation{SetJson: []byte(u)}
 	req.Mutations = []*api.Mutation{mu}
 
 	if _, err := dg.NewTxn().Do(ctx, req); err != nil {
@@ -117,16 +183,18 @@ func UpdateUser(id string, u User) {
 
 	variables := map[string]string{"$id": id}
 	q := `query getUser($id: string){
-		get(func: uid($id)){
+		user(func: uid($id)){
 			name
 			role
 		}
 	}`
 
-	resp, err := dg.NewReadOnlyTxn().QueryWithVars(ctx, q, variables)
-	if err != nil || resp == nil {
+	res, err := dg.NewReadOnlyTxn().QueryWithVars(ctx, q, variables)
+	if err != nil || res == nil {
 		log.Fatal(err)
 	}
+
+	return string(res.Json)
 }
 
 // DeleteUser deletes a user
@@ -145,23 +213,22 @@ func DeleteUser(id string) {
 
 	variables := map[string]string{"$id": id}
 	q := `query getUser($id: string){
-		get(func: uid($id)){
+		user(func: uid($id)){
 			name
 			role
 		}
 	}`
 
-	mu := &api.Mutation{}
+	mu := &api.Mutation{CommitNow: true}
 	dgo.DeleteEdges(mu, id, "name", "role", "vehicle")
-	mu.CommitNow = true
 
-	resp, err := dg.NewTxn().Mutate(ctx, mu)
+	res, err := dg.NewTxn().Mutate(ctx, mu)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	resp, err = dg.NewTxn().QueryWithVars(ctx, q, variables)
-	if err != nil || resp == nil {
+	res, err = dg.NewTxn().QueryWithVars(ctx, q, variables)
+	if err != nil || res == nil {
 		log.Fatal(err)
 	}
 }
@@ -182,104 +249,23 @@ func DeleteConnectionBetweenUserAndVehicle(id string) {
 
 	variables := map[string]string{"$id": id}
 	q := `query getUser($id: string){
-		get(func: uid($id)){
+		user(func: uid($id)){
 			name
 			role
 		}
 	}`
 
-	mu := &api.Mutation{}
+	mu := &api.Mutation{CommitNow: true}
 	dgo.DeleteEdges(mu, id, "vehicle")
-	mu.CommitNow = true
 
-	resp, err := dg.NewTxn().Mutate(ctx, mu)
+	res, err := dg.NewTxn().Mutate(ctx, mu)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	resp, err = dg.NewTxn().QueryWithVars(ctx, q, variables)
-	if err != nil || resp == nil {
+	res, err = dg.NewTxn().QueryWithVars(ctx, q, variables)
+	if err != nil || res == nil {
 		log.Fatal(err)
 	}
 
-}
-
-// GetUser gets a user
-func GetUser(id string) {
-
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
-	if err != nil {
-		log.Fatal("While trying to dial gRPC")
-	}
-	defer conn.Close()
-
-	dc := api.NewDgraphClient(conn)
-	dg := dgo.NewDgraphClient(dc)
-
-	ctx := context.Background()
-
-	variables := map[string]string{"$id": id}
-	q := `query getUser($id: string){
-		get(func: uid($id)){
-			name
-			role
-			vehicle {
-				type
-				latitude
-				longitude
-				needsservice
-			}
-		}
-	}`
-
-	resp, err := dg.NewTxn().QueryWithVars(ctx, q, variables)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = json.Unmarshal(resp.Json, &resp)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(string(resp.Json))
-}
-
-// GetAllUsers gets all users
-func GetAllUsers() {
-
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
-	if err != nil {
-		log.Fatal("While trying to dial gRPC")
-	}
-	defer conn.Close()
-
-	dc := api.NewDgraphClient(conn)
-	dg := dgo.NewDgraphClient(dc)
-
-	ctx := context.Background()
-
-	txn := dg.NewTxn()
-	defer txn.Discard(ctx)
-
-	q := `
-	{
-		users(func: has(name)) {
-		  name
-		  role
-		  vehicle {
-			  type
-			  latitude
-			  longitude
-			  needsservice
-		  }
-		}
-	}`
-
-	res, err := txn.Query(ctx, q)
-	fmt.Printf("%s\n", res.Json)
-
-	if err != nil {
-		log.Fatal(err)
-	}
 }
