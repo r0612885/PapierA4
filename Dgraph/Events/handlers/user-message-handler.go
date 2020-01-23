@@ -14,7 +14,17 @@ func GetUsersMessageHandler(payload map[string]interface{}, hash string, metadat
 
 	mapstructure.Decode(payload, &message)
 
-	users := userservice.GetUsers()
+	users, err := userservice.GetUsers()
+
+	var msg string
+
+	if err == true {
+		msg = "getting users failed"
+	} else{
+		msg = "Success"
+	}
+
+	fmt.Println(msg)
 
 	echoNotification := &models.Notification{
 		Type:   "global",
@@ -36,7 +46,17 @@ func GetUserMessageHandler(payload map[string]interface{}, hash string, metadata
 
 	mapstructure.Decode(payload, &message)
 
-	user := userservice.GetUser(message.ID)
+	user, err := userservice.GetUser(message.ID)
+
+	var msg string
+
+	if err == true {
+		msg = "getting users failed"
+	} else{
+		msg = "Success"
+	}
+
+	fmt.Println(msg)
 
 	echoNotification := &models.Notification{
 		Type:   "global",
@@ -58,7 +78,17 @@ func CreateUserMessageHandler(payload map[string]interface{}, hash string, metad
 
 	mapstructure.Decode(payload, &message)
 
-	userID := userservice.CreateUser(message.Content)
+	userID, err := userservice.CreateUser(message.Content)
+
+	var msg string
+
+	if err == true {
+		msg = "getting users failed"
+	} else{
+		msg = "Success"
+	}
+
+	fmt.Println(msg)
 
 	echoNotification := &models.Notification{
 		Type:   "global",
@@ -80,7 +110,17 @@ func UpdateUserMessageHandler(payload map[string]interface{}, hash string, metad
 
 	mapstructure.Decode(payload, &message)
 
-	user := userservice.UpdateUser(message.ID, message.Content)
+	user, err := userservice.UpdateUser(message.ID, message.Content)
+
+	var msg string
+
+	if err == true {
+		msg = "getting users failed"
+	} else{
+		msg = "Success"
+	}
+
+	fmt.Println(msg)
 
 	echoNotification := &models.Notification{
 		Type:   "global",
@@ -102,7 +142,17 @@ func DeleteUserMessageHandler(payload map[string]interface{}, hash string, metad
 
 	mapstructure.Decode(payload, &message)
 
-	userservice.DeleteUser(message.ID)
+	err := userservice.DeleteUser(message.ID)
+
+	var msg string
+
+	if err == true {
+		msg = "getting users failed"
+	} else{
+		msg = "Successfull delete of user"
+	}
+
+	fmt.Println(msg)
 
 	echoNotification := &models.Notification{
 		Type:   "global",
@@ -125,13 +175,56 @@ func DeleteConnectionBetweenUserAndVehicleMessageHandler(payload map[string]inte
 
 	mapstructure.Decode(payload, &message)
 
-	userservice.DeleteConnectionBetweenUserAndVehicle(message.ID)
+	err := userservice.DeleteConnectionBetweenUserAndVehicle(message.ID)
+
+	var msg string
+
+	if err == true {
+		msg = "getting users failed"
+	} else{
+		msg = "Successfull delete between user and vehicle"
+	}
+
+	fmt.Println(msg)
 
 	echoNotification := &models.Notification{
 		Type:   "global",
 		Target: "any",
 		Payload: map[string]interface{}{
 			"message": "Connection Deleted!",
+		},
+		Hash: fmt.Sprintf("n:%s", hash),
+	}
+
+	var ns mock.NotificationService
+
+	ns.Publish(echoNotification)
+}
+
+// CreateConnectionBetweenUserAndVehicleMessageHandler is the event handler for topic "message" and action "createConnectionUserAndVehicle"
+func CreateConnectionBetweenUserAndVehicleMessageHandler(payload map[string]interface{}, hash string, metadata map[string]string) {
+
+	var message models.Message
+
+	mapstructure.Decode(payload, &message)
+
+	user, err := userservice.CreateConnectionBetweenVehicleAndUser(message.ID, message.Content)
+
+	var msg string
+
+	if err == true {
+		msg = "getting users failed"
+	} else{
+		msg = "Success"
+	}
+
+	fmt.Println(msg)
+
+	echoNotification := &models.Notification{
+		Type:   "global",
+		Target: "any",
+		Payload: map[string]interface{}{
+			"message": user,
 		},
 		Hash: fmt.Sprintf("n:%s", hash),
 	}
