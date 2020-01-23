@@ -269,3 +269,57 @@ func DeleteConnectionBetweenUserAndVehicle(id string) {
 	}
 
 }
+
+// CreateConnectionBetweenVehicleAndUser connection between a user and a vehicle
+func CreateConnectionBetweenVehicleAndUser(vehicleID string, userID string) {
+
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	if err != nil {
+		log.Fatal("While trying to dial gRPC")
+	}
+	defer conn.Close()
+
+	dc := api.NewDgraphClient(conn)
+	dg := dgo.NewDgraphClient(dc)
+
+	ctx := context.Background()
+
+	pb, err := json.Marshal(User{Uid: userID, Vehicle: Vehicle{Uid: vehicleID}})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	req := &api.Request{CommitNow: true}
+
+	mu := &api.Mutation{SetJson: pb}
+	mu.SetJson = pb
+	req.Mutations = []*api.Mutation{mu}
+
+
+	if _, err := dg.NewTxn().Do(ctx, req); err != nil {
+		log.Fatal(err)
+	}
+
+	variables := map[string]string{"$id": userID}
+
+
+	q := `query getUser($id: string){
+		user(func: uid($id)){
+			uid
+			name
+			role
+
+			vehicle{
+				uid
+				type
+			}
+		}
+	}`
+
+	resp, err := dg.NewReadOnlyTxn().QueryWithVars(ctx, q, variables)
+	if err != nil || resp == nil {
+		log.Fatal(err)
+	}
+
+}
+
