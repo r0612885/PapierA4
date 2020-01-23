@@ -9,9 +9,9 @@ func main() {
 
 	location := locationservice.Location{Uid: "0xa1", Vid: "0xh1", Lat: "50", Lon: "60"}
 
-	metrics := locationservice.CreateMockMetric(location)
+	metric := locationservice.CreateMockMetric(location)
 
-	locationservice.WriteRow(client, metrics)
+	locationservice.WriteRow(client, metric)
 
 	locationservice.Exit(client)
 
