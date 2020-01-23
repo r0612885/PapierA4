@@ -14,13 +14,13 @@ func main() {
 
 		// USER EVENTS
 
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "getUsers",
-		// 	Payload: map[string]interface{}{
-		// 	},
-		// 	Hash: "GetUsers",
-		// },
+		models.Event{
+			Topic:  "message",
+			Action: "getUsers",
+			Payload: map[string]interface{}{
+			},
+			Hash: "GetUsers",
+		},
 		// models.Event{
 		// 	Topic:  "message",
 		// 	Action: "getUser",
@@ -39,6 +39,15 @@ func main() {
 		// },
 		// models.Event{
 		// 	Topic:  "message",
+		// 	Action: "createConnectionUserAndVehicle",
+		// 	Payload: map[string]interface{}{
+		// 		"id": "0x8",
+		// 		"content": "0x6",
+		// 	},
+		// 	Hash: "CreateConnectionUserAndVehicle",
+		// },
+		// models.Event{
+		// 	Topic:  "message",
 		// 	Action: "updateUser",
 		// 	Payload: map[string]interface{}{
 		// 		"id": "0x68",
@@ -46,19 +55,19 @@ func main() {
 		// 	},
 		// 	Hash: "UpdateUser",
 		// },
-		models.Event{
-			Topic:  "message",
-			Action: "deleteUser",
-			Payload: map[string]interface{}{
-				"id": "0x2d",
-			},
-			Hash: "DeleteUser",
-		},
+		// models.Event{
+		// 	Topic:  "message",
+		// 	Action: "deleteUser",
+		// 	Payload: map[string]interface{}{
+		// 		"id": "0x2d",
+		// 	},
+		// 	Hash: "DeleteUser",
+		// },
 		// models.Event{
 		// 	Topic:  "message",
 		// 	Action: "deleteConnectionUserAndVehicle",
 		// 	Payload: map[string]interface{}{
-		// 		"id": "0x5",
+		// 		"id": "0x2",
 		// 	},
 		// 	Hash: "DeleteConnectionUserAndVehicle",
 		// },
@@ -114,12 +123,13 @@ func main() {
 
 	// USER SUBSCRIBES
 
-	// eventService.Subscribe("message", "getUsers", handlers.GetUsersMessageHandler)
+	eventService.Subscribe("message", "getUsers", handlers.GetUsersMessageHandler)
 	// eventService.Subscribe("message", "getUser", handlers.GetUserMessageHandler)
 	// eventService.Subscribe("message", "createUser", handlers.CreateUserMessageHandler)
+	// eventService.Subscribe("message", "createConnectionUserAndVehicle", handlers.CreateConnectionBetweenUserAndVehicleMessageHandler)
 	// eventService.Subscribe("message", "updateUser", handlers.UpdateUserMessageHandler)
 	// eventService.Subscribe("message", "deleteUser", handlers.DeleteUserMessageHandler)
-	// eventService.Subscribe("message", "deleteConnectionUserAndVehicle", handlers.DeleteConnectionBetweenUserAndVehicleMessageHandler) NOG TESTEN!!!
+	// eventService.Subscribe("message", "deleteConnectionUserAndVehicle", handlers.DeleteConnectionBetweenUserAndVehicleMessageHandler) 
 
 	// VEHICLE SUBSCRIBES
 
