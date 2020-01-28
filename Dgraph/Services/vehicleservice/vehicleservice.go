@@ -42,6 +42,10 @@ func GetVehicles() string {
 		  latitude
 		  longitude
 		  needsservice
+      			service{
+					dateCompleted
+					description  
+			}
 		}
 	}`
 
@@ -76,6 +80,10 @@ func GetVehicle(id string) string {
 			latitude
 			longitude
 			needsservice
+				service {
+				dateCompleted
+				description  
+			}
 		}
 	}`
 
@@ -122,6 +130,10 @@ func CreateVehicle(v string) string {
 				latitude
 				longitude
 				needsservice
+					service {
+						dateCompleted
+						description  
+				}
 			}
 	}`
 
@@ -163,6 +175,10 @@ func UpdateVehicle(id string, v string) string {
 			latitude
 			longitude
 			needsservice
+				service {
+					dateCompleted
+					description  
+			}
 		}
 	}`
 
@@ -195,6 +211,10 @@ func DeleteVehicle(id string) {
 			latitude
 			longitude
 			needsservice
+				service {
+					dateCompleted
+					description  
+			}
 		}
 	}`
 
