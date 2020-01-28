@@ -1,9 +1,12 @@
 			name: string @index(exact) .
+			password: string @index(hash) .
 			role: string .
 			needsservice: bool .
 			type: string .
 			latitude: float .
 			longitude: float .
+			dateCompleted: dateTime .
+			description: string .
 
 			type Voertuig {
 				type
@@ -15,4 +18,9 @@
 			type User {
 				name
 				role
+			}
+
+			type Service {
+				dateCompleted
+				description
 			}

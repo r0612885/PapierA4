@@ -1,0 +1,4 @@
+priv: openssl genrsa -out app.rsa 1024
+pub: openssl rsa -in app.rsa -pubout > app.rsa.pub
+
+in de map "keys" genereren
