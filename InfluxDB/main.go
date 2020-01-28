@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 
-	influxdb "github.com/influxdata/influxdb-client-go"
 	"github.com/r0612885/PapierA4/InfluxDB/Services/locationservice"
 )
 
@@ -16,25 +15,17 @@ func main() {
 
 	locationservice.WriteRow(client, metric)
 
-	res := locationservice.ReadLocationOfUser(client, "0xAA")
+	lou := locationservice.ReadLastLocationOfUser(client, "0xAA")
 
-	fmt.Println(res)
+	fmt.Printf("Last location of user %v:\n%v\n", "0xAA", lou)
 
-	var csvRes influxdb.QueryCSVResult
+	lov := locationservice.ReadLastLocationOfVehicle(client, "0xh1")
 
-	_interface := map[string]interface{}{
-		"row": csvRes.Row,
-		// "colnames": colnames,
-	}
+	fmt.Printf("Last location of vehicle %v:\n%v\n", "0xh1", lov)
 
-	err := res.Unmarshal(_interface)
-	if err != nil {
-		panic(err)
-	}
+	lovs := locationservice.ReadLastLocationOfVehicles(client)
 
-	fmt.Println(csvRes.Row)
-	// fmt.Println(colnames)
+	fmt.Printf("Last location of all vehicles:\n%v\n", lovs)
 
 	locationservice.Exit(client)
-
 }
