@@ -56,9 +56,61 @@ func GetUsers() (string, bool) {
 			  latitude
 			  longitude
 			  needsservice
-		  }
+			  	service {
+					dateCompleted
+					description  
+				}
+		  	}
 		}
 	}`
+
+	res, err := txn.Query(ctx, q)
+
+	if err != nil {
+		error = true
+		log.Fatal(err)
+	}
+
+	return string(res.Json), error
+}
+
+// GetActiveUsers gets all users who are currently operating a vehicle
+func GetActiveUsers() (string, bool) {
+
+	error := false
+
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	if err != nil {
+		log.Fatal("While trying to dial gRPC")
+	}
+	defer conn.Close()
+
+	dc := api.NewDgraphClient(conn)
+	dg := dgo.NewDgraphClient(dc)
+
+	ctx := context.Background()
+
+	txn := dg.NewTxn()
+	defer txn.Discard(ctx)
+
+	q := `
+	{
+		query(func: has(vehicle)) {
+			name
+			password
+			role
+		  		vehicle {
+					type
+					needsservice
+					latitude
+					longitude
+						service {
+							dateCompleted
+							description  
+					}
+				}
+			}
+	  }`
 
 	res, err := txn.Query(ctx, q)
 
@@ -89,16 +141,20 @@ func GetUser(id string) (string, bool) {
 	variables := map[string]string{"$id": id}
 	q := `query getUser($id: string){
 		user(func: uid($id)){
-			uid
 			name
+			password
 			role
-			vehicle {
-				type
-				latitude
-				longitude
-				needsservice
+		  		vehicle {
+					type
+					needsservice
+					latitude
+					longitude
+						service {
+							dateCompleted
+							description  
+						}
+				  }
 			}
-		}
 	}`
 
 	res, err := dg.NewTxn().QueryWithVars(ctx, q, variables)
@@ -142,15 +198,19 @@ func CreateUser(u string) (string, bool) {
 	variables := map[string]string{"$id": assigned.Uids["user"]}
 	q := `query getUser($id: string){
 		user(func: uid($id)){
-			uid
 			name
+			password
 			role
-			vehicle {
-				type
-				latitude
-				longitude
-				needsservice
-			}
+		  		vehicle {
+					type
+					needsservice
+					latitude
+					longitude
+						service {
+							dateCompleted
+							description  
+					}
+				}
 		}
 	}`
 
@@ -200,13 +260,18 @@ func CreateConnectionBetweenVehicleAndUser(vehicleID string, userID string) (str
 
 	q := `query getUser($id: string){
 		user(func: uid($id)){
-			uid
 			name
+			password
 			role
-
-			vehicle{
-				uid
-				type
+		  		vehicle {
+					type
+					needsservice
+					latitude
+					longitude
+						service {
+							dateCompleted
+							description  
+					}
 			}
 		}
 	}`
@@ -253,6 +318,7 @@ func UpdateUser(id string, u string) (string, bool) {
 	q := `query getUser($id: string){
 		user(func: uid($id)){
 			name
+			password
 			role
 		}
 	}`
@@ -286,6 +352,7 @@ func DeleteUser(id string) bool {
 	q := `query getUser($id: string){
 		user(func: uid($id)){
 			name
+			password
 			role
 		}
 	}`
@@ -328,6 +395,7 @@ func DeleteConnectionBetweenUserAndVehicle(id string) bool {
 	q := `query getUser($id: string){
 		user(func: uid($id)){
 			name
+			password
 			role
 		}
 	}`
