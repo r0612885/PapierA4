@@ -39,7 +39,7 @@ func CompleteServiceMessageHandler(payload map[string]interface{}, hash string, 
 
 	var msg string
 
-	res, err := serviceservice.CompleteService(message.Content, message.ID)
+	res, err := serviceservice.CompleteService(message.ID)
 	if err == true {
 		msg = "completingservice failed"
 	} else {
