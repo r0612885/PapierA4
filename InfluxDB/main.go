@@ -1,31 +1,60 @@
 package main
 
 import (
-	"fmt"
+	"log"
 
-	"github.com/r0612885/PapierA4/InfluxDB/Services/locationservice"
+	"github.com/r0612885/PapierA4/InfluxDB/Events/handlers"
+	"github.com/r0612885/PapierA4/InfluxDB/Events/mock"
+	"github.com/r0612885/PapierA4/InfluxDB/Events/models"
 )
 
 func main() {
-	client := locationservice.Init()
+	mockEvents := []models.Event{
 
-	location := locationservice.Location{Uid: "0xDA", Vid: "0xh1", Lat: "50", Lon: "60"}
+		models.Event{
+			Topic:  "message",
+			Action: "writeRow",
+			Payload: map[string]interface{}{
+				"content": `{"Uid": "0xFF","Vid": "1x23","Lat": "51.6594", "Lon": "45.2397"}`,
+			},
+			Hash: "WriteRow",
+		},
+		models.Event{
+			Topic:  "message",
+			Action: "getLastUserLocation",
+			Payload: map[string]interface{}{
+				"id": "0xAA",
+			},
+			Hash: "GetLastUserLocation",
+		},
+		models.Event{
+			Topic:  "message",
+			Action: "getLastVehicleLocation",
+			Payload: map[string]interface{}{
+				"id": "0x02",
+			},
+			Hash: "GetLastVehicleLocation",
+		},
+		models.Event{
+			Topic:   "message",
+			Action:  "getAllVehiclesLastLocation",
+			Payload: map[string]interface{}{},
+			Hash:    "GetAllVehiclesLastLocation",
+		},
+	}
 
-	metric := locationservice.CreateMockMetric(location)
+	eventService := mock.EventService{
+		MockedQueue:  mockEvents,
+		EventChannel: make(chan models.Event),
+	}
 
-	locationservice.WriteRow(client, metric)
+	eventService.Subscribe("message", "writeRow", handlers.WriteRowMessageHandler)
+	eventService.Subscribe("message", "getLastUserLocation", handlers.GetLastLocationOfUserMessageHandler)
+	eventService.Subscribe("message", "getLastVehicleLocation", handlers.GetLastLocationOfVehicleMessageHandler)
+	eventService.Subscribe("message", "getAllVehiclesLastLocation", handlers.GetAllVehiclesLastLocationMessageHandler)
 
-	lou := locationservice.ReadLastLocationOfUser(client, "0xAA")
-
-	fmt.Printf("Last location of user %v:\n%v\n", "0xAA", lou)
-
-	lov := locationservice.ReadLastLocationOfVehicle(client, "0xh1")
-
-	fmt.Printf("Last location of vehicle %v:\n%v\n", "0xh1", lov)
-
-	lovs := locationservice.ReadLastLocationOfVehicles(client)
-
-	fmt.Printf("Last location of all vehicles:\n%v\n", lovs)
-
-	locationservice.Exit(client)
+	err := eventService.ListenForEvents()
+	if err != nil {
+		log.Fatal(err)
+	}
 }

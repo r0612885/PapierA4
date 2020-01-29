@@ -3,8 +3,9 @@ package mock
 import (
 	"fmt"
 
-	"github.com/r0612885/PapierA4/Dgraph/Events/models"
+	"github.com/r0612885/PapierA4/InfluxDB/Events/models"
 )
+
 // NotificationService is the mock implementation of the actual notification service
 type NotificationService struct{}
 

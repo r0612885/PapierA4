@@ -18,15 +18,13 @@ type Location struct {
 }
 
 func WriteRow(_influx *influxdb.Client, _metric []influxdb.Metric) {
-	n, err := _influx.Write(context.Background(), "tracking", "papierA4", _metric...)
+	_, err := _influx.Write(context.Background(), "tracking", "papierA4", _metric...)
 	if err != nil {
 		log.Fatal(err) // as above use your own error handling here.
 	}
-
-	fmt.Println("Created rows: ", n)
 }
 
-func CreateMockMetric(_location Location) []influxdb.Metric {
+func CreateMetric(_location Location) []influxdb.Metric {
 	// we use client.NewRowMetric for the example because it's easy, but if you need extra performance
 	// it is fine to manually build the []client.Metric{}.
 
@@ -55,7 +53,7 @@ func Init() (_influx *influxdb.Client) {
 	return _influx
 }
 
-func ReadLastLocationOfUser(_influx *influxdb.Client, _uid string) string {
+func GetLastLocationOfUser(_influx *influxdb.Client, _uid string) string {
 	stop := time.Now().Format(time.RFC3339)
 	start := time.Now().AddDate(0, -1, 0).Format(time.RFC3339)
 
@@ -100,7 +98,7 @@ func ReadLastLocationOfUser(_influx *influxdb.Client, _uid string) string {
 	return string(result)
 }
 
-func ReadLastLocationOfVehicle(_influx *influxdb.Client, _vid string) string {
+func GetLastLocationOfVehicle(_influx *influxdb.Client, _vid string) string {
 	stop := time.Now().Format(time.RFC3339)
 	start := time.Now().AddDate(0, -1, 0).Format(time.RFC3339)
 
@@ -144,7 +142,7 @@ func ReadLastLocationOfVehicle(_influx *influxdb.Client, _vid string) string {
 	return string(result)
 }
 
-func ReadLastLocationOfVehicles(_influx *influxdb.Client) string {
+func GetLastLocationOfVehicles(_influx *influxdb.Client) string {
 	stop := time.Now().Format(time.RFC3339)
 	start := time.Now().AddDate(0, -1, 0).Format(time.RFC3339)
 

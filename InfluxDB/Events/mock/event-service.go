@@ -4,8 +4,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/r0612885/PapierA4/Dgraph/Events/models"
+	"github.com/r0612885/PapierA4/InfluxDB/Events/models"
 )
+
 // EventService is the mock implementation of the actual event service
 type EventService struct {
 	EventChannel chan models.Event
