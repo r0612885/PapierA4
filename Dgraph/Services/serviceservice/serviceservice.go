@@ -70,8 +70,7 @@ func CreateService(s string, vehicleID string) string {
 						dateCompleted
 						description
 				}
-
-	}`
+}`
 
 	res, err := dg.NewTxn().QueryWithVars(ctx, q, variables)
 	if err != nil || res == nil {
@@ -96,4 +95,61 @@ func CreateService(s string, vehicleID string) string {
 	}
 
 	return string(res.Json)
+}
+
+func CompleteService(s string, vehicleID string) (string, bool) {
+	error := false
+
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	if err != nil {
+		log.Fatal("While trying to dial gRPC")
+	}
+	defer conn.Close()
+
+	dc := api.NewDgraphClient(conn)
+	dg := dgo.NewDgraphClient(dc)
+
+	ctx := context.Background()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	req := &api.Request{CommitNow: true}
+
+	var service Service
+	err = json.Unmarshal([]byte(s), &service)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	service.DateCompleted = time.Now()
+
+	updated, err := json.Marshal(service)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	mu := &api.Mutation{SetJson: []byte(updated)}
+	req.Mutations = []*api.Mutation{mu}
+
+	if _, err := dg.NewTxn().Do(ctx, req); err != nil {
+		log.Fatal(err)
+	}
+
+	variables := map[string]string{"$id": vehicleID}
+	q := `query getService($id: string){
+		service(func: uid($id)) {
+			dateCompleted
+			description
+	}
+	}`
+
+	res, err := dg.NewReadOnlyTxn().QueryWithVars(ctx, q, variables)
+	if err != nil || res == nil {
+		error = true
+		log.Fatal(err)
+	}
+
+	return string(res.Json), error
 }

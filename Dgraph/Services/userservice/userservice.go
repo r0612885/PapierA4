@@ -250,13 +250,11 @@ func CreateConnectionBetweenVehicleAndUser(vehicleID string, userID string) (str
 	mu.SetJson = pb
 	req.Mutations = []*api.Mutation{mu}
 
-
 	if _, err := dg.NewTxn().Do(ctx, req); err != nil {
 		log.Fatal(err)
 	}
 
 	variables := map[string]string{"$id": userID}
-
 
 	q := `query getUser($id: string){
 		user(func: uid($id)){
@@ -416,6 +414,4 @@ func DeleteConnectionBetweenUserAndVehicle(id string) bool {
 	}
 
 	return error
-
 }
-

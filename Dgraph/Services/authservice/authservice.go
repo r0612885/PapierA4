@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/dgrijalva/jwt-go/request"
+	// "github.com/dgrijalva/jwt-go/request"
 )
 
 //STRUCT DEFINITIONS
@@ -113,30 +113,29 @@ func Login(cred string) string {
 	return string(json)
 }
 
-
 //ValidateTokenMiddleware validates the token of the user
 // func ValidateTokenMiddleware(token string) {
 
-	// if token.Valid {
-	// 	next(w, r)
-	// }
+// if token.Valid {
+// 	next(w, r)
+// }
 
-	//validate token
-	// token, err := request.ParseFromRequest(r,request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error){
-	// 	return verifyKey, nil
-	// })
+//validate token
+// token, err := request.ParseFromRequest(r,request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error){
+// 	return verifyKey, nil
+// })
 
-	// if err == nil {
+// if err == nil {
 
-	// 	if token.Valid{
-	// 		next(w, r)
-	// 	} else { {}
-	// 		w.WriteHeader(http.StatusUnauthorized)
-	// 		fmt.Fprint(w, "Token is not valid")
-	// 	}
-	// } else {
-	// 	w.WriteHeader(http.StatusUnauthorized)
-	// 	fmt.Fprint(w, "Unauthorised access to this resource")
-	// }
+// 	if token.Valid{
+// 		next(w, r)
+// 	} else { {}
+// 		w.WriteHeader(http.StatusUnauthorized)
+// 		fmt.Fprint(w, "Token is not valid")
+// 	}
+// } else {
+// 	w.WriteHeader(http.StatusUnauthorized)
+// 	fmt.Fprint(w, "Unauthorised access to this resource")
+// }
 
 // }
