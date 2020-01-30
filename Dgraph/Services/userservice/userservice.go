@@ -31,7 +31,7 @@ func GetUsers() (string, bool) {
 
 	error := false
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -79,7 +79,7 @@ func GetActiveUsers() (string, bool) {
 
 	error := false
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -127,7 +127,7 @@ func GetUser(id string) (string, bool) {
 
 	error := false
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -171,7 +171,7 @@ func CreateUser(u string) (string, bool) {
 
 	error := false
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -228,7 +228,7 @@ func CreateConnectionBetweenVehicleAndUser(vehicleID string, userID string) (str
 
 	error := false
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -288,7 +288,7 @@ func UpdateUser(id string, u string) (string, bool) {
 
 	error := false
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -335,7 +335,7 @@ func DeleteUser(id string) bool {
 
 	error := false
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -378,7 +378,7 @@ func DeleteConnectionBetweenUserAndVehicle(id string) bool {
 
 	error := false
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}

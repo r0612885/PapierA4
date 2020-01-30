@@ -17,11 +17,10 @@ type Vehicle struct {
 	Needsservice bool    `json:"needsservice"`
 }
 
-
 // GetVehicles gets all vehicles
 func GetVehicles() string {
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -58,11 +57,10 @@ func GetVehicles() string {
 	return string(res.Json)
 }
 
-
 // GetVehicle gets a vehicle
 func GetVehicle(id string) string {
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -98,7 +96,7 @@ func GetVehicle(id string) string {
 // CreateVehicle creates a vehicle
 func CreateVehicle(v string) string {
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -114,7 +112,7 @@ func CreateVehicle(v string) string {
 
 	mu := &api.Mutation{
 		CommitNow: true,
-		SetJson: []byte(v),
+		SetJson:   []byte(v),
 	}
 
 	assigned, err := dg.NewTxn().Mutate(ctx, mu)
@@ -148,7 +146,7 @@ func CreateVehicle(v string) string {
 // UpdateVehicle updates a vehicle
 func UpdateVehicle(id string, v string) string {
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -193,7 +191,7 @@ func UpdateVehicle(id string, v string) string {
 // DeleteVehicle deletes a vehicle
 func DeleteVehicle(id string) {
 
-	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -218,7 +216,7 @@ func DeleteVehicle(id string) {
 		}
 	}`
 
-	mu := &api.Mutation{CommitNow: true,}
+	mu := &api.Mutation{CommitNow: true}
 	dgo.DeleteEdges(mu, id, "type", "latitude", "longitude", "needsservice")
 
 	resp, err := dg.NewTxn().Mutate(ctx, mu)

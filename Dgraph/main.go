@@ -12,10 +12,9 @@ import (
 )
 
 func main() {
-
 	mockEvents := []models.Event{
 
-		// USER EVENTS
+		// // USER EVENTS
 
 		// models.Event{
 		// 	Topic:   "message",
@@ -117,22 +116,32 @@ func main() {
 		// },
 
 		// SERVICE EVENTS
+
+		// models.Event{
+		// 	Topic:  "message",
+		// 	Action: "createService",
+		// 	Payload: map[string]interface{}{
+		// 		"id":      "0x17",
+		// 		"content": `{"uid": "_:service","description": "Motorpech","datecompleted": "0"}`,
+		// 	},
+		// 	Hash: "CreateService",
+		// },
+		// models.Event{
+		// 	Topic:  "message",
+		// 	Action: "completeService",
+		// 	Payload: map[string]interface{}{
+		// 		"id":      "0x5f",
+		// 		"content": `{ "service": [{"uid": "0x5f","datecompleted": "` + strconv.Itoa(int(time.Now().Unix())) + `"}]}`,
+		// 	},
+		// 	Hash: "CompleteService",
+		// },
 		models.Event{
 			Topic:  "message",
-			Action: "createService",
+			Action: "getLastService",
 			Payload: map[string]interface{}{
-				"id":      "0x65",
-				"content": `{"uid": "_:service","description": "Lekke baaaaaand","dateCompleted": "0001-01-01T00:00:00.000Z"}`,
+				"id": "0x17",
 			},
-			Hash: "CreateService",
-		},
-		models.Event{
-			Topic:  "message",
-			Action: "completeService",
-			Payload: map[string]interface{}{
-				"id": "0x30",
-			},
-			Hash: "CompleteService",
+			Hash: "GetLastService",
 		},
 	}
 
@@ -141,7 +150,7 @@ func main() {
 		EventChannel: make(chan models.Event),
 	}
 
-	// USER SUBSCRIBES
+	// // USER SUBSCRIBES
 
 	// eventService.Subscribe("message", "getUsers", handlers.GetUsersMessageHandler)
 	// eventService.Subscribe("message", "getUser", handlers.GetUserMessageHandler)
@@ -160,8 +169,10 @@ func main() {
 	// eventService.Subscribe("message", "deleteVehicle", handlers.DeleteVehicleMessageHandler)
 
 	// SERVICE SUBSCRIBES
-	eventService.Subscribe("message", "createService", handlers.CreateServiceMessageHandler)
-	eventService.Subscribe("message", "completeService", handlers.CompleteServiceMessageHandler)
+
+	// eventService.Subscribe("message", "createService", handlers.CreateServiceMessageHandler)
+	// eventService.Subscribe("message", "completeService", handlers.CompleteServiceMessageHandler)
+	eventService.Subscribe("message", "getLastService", handlers.GetTimeSinceLastServiceMessageHandler)
 
 	err := eventService.ListenForEvents()
 

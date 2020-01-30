@@ -39,12 +39,39 @@ func CompleteServiceMessageHandler(payload map[string]interface{}, hash string, 
 
 	var msg string
 
-	res, err := serviceservice.CompleteService(message.ID)
+	res, err := serviceservice.CompleteService(message.Content, message.ID)
 	if err == true {
 		msg = "completingservice failed"
 	} else {
 		msg = "Success"
 	}
+
+	fmt.Println(msg)
+
+	echoNotification := &models.Notification{
+		Type:   "global",
+		Target: "any",
+		Payload: map[string]interface{}{
+			"message": res,
+		},
+		Hash: fmt.Sprintf("n:%s", hash),
+	}
+
+	var ns mock.NotificationService
+
+	ns.Publish(echoNotification)
+}
+
+func GetTimeSinceLastServiceMessageHandler(payload map[string]interface{}, hash string, metadata map[string]string) {
+	var message models.Message
+
+	mapstructure.Decode(payload, &message)
+
+	var msg string
+
+	fmt.Println(message.ID)
+
+	res := serviceservice.GetTimeSinceLastService(message.ID)
 
 	fmt.Println(msg)
 
