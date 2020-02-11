@@ -2,6 +2,7 @@ package vehicleservice
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/dgraph-io/dgo/v2"
@@ -18,9 +19,9 @@ type Vehicle struct {
 }
 
 // GetVehicles gets all vehicles
-func GetVehicles() string {
+func GetVehicles() []byte {
 
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -37,6 +38,7 @@ func GetVehicles() string {
 	q := `
 	{
 		vehicles(func: has(type)) {
+		  uid
 		  type
 		  latitude
 		  longitude
@@ -54,13 +56,13 @@ func GetVehicles() string {
 		log.Fatal(err)
 	}
 
-	return string(res.Json)
+	return res.Json
 }
 
 // GetVehicle gets a vehicle
-func GetVehicle(id string) string {
+func GetVehicle(id string) []byte {
 
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -74,6 +76,7 @@ func GetVehicle(id string) string {
 	variables := map[string]string{"$id": id}
 	q := `query getVehicle($id: string){
 		vehicle(func: uid($id)){
+			uid
 			type
 			latitude
 			longitude
@@ -90,13 +93,13 @@ func GetVehicle(id string) string {
 		log.Fatal(err)
 	}
 
-	return string(res.Json)
+	return res.Json
 }
 
 // CreateVehicle creates a vehicle
-func CreateVehicle(v string) string {
+func CreateVehicle(v []byte) []byte {
 
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -117,13 +120,12 @@ func CreateVehicle(v string) string {
 
 	assigned, err := dg.NewTxn().Mutate(ctx, mu)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Print(err)
 	}
 
 	variables := map[string]string{"$id": assigned.Uids["vehicle"]}
 	q := `query getVehicle($id: string){
 		vehicle(func: uid($id)){
-				uid
 				type
 				latitude
 				longitude
@@ -137,16 +139,16 @@ func CreateVehicle(v string) string {
 
 	res, err := dg.NewTxn().QueryWithVars(ctx, q, variables)
 	if err != nil || res == nil {
-		log.Fatal(err)
+		fmt.Print(err)
 	}
 
-	return string(res.Json)
+	return res.Json
 }
 
 // UpdateVehicle updates a vehicle
-func UpdateVehicle(id string, v string) string {
+func UpdateVehicle(id string, v []byte) []byte {
 
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -185,13 +187,13 @@ func UpdateVehicle(id string, v string) string {
 		log.Fatal(err)
 	}
 
-	return string(res.Json)
+	return res.Json
 }
 
 // DeleteVehicle deletes a vehicle
 func DeleteVehicle(id string) {
 
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}

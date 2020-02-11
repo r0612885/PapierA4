@@ -3,7 +3,7 @@ package userservice
 import (
 	"context"
 	"encoding/json"
-
+	"fmt"
 	"log"
 
 	"github.com/dgraph-io/dgo/v2"
@@ -27,11 +27,9 @@ type User struct {
 }
 
 // GetUsers gets all users
-func GetUsers() (string, bool) {
+func GetUsers() []byte {
 
-	error := false
-
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -67,19 +65,16 @@ func GetUsers() (string, bool) {
 	res, err := txn.Query(ctx, q)
 
 	if err != nil {
-		error = true
 		log.Fatal(err)
 	}
 
-	return string(res.Json), error
+	return res.Json
 }
 
 // GetActiveUsers gets all users who are currently operating a vehicle
-func GetActiveUsers() (string, bool) {
+func GetActiveUsers() []byte {
 
-	error := false
-
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -95,11 +90,13 @@ func GetActiveUsers() (string, bool) {
 
 	q := `
 	{
-		query(func: has(vehicle)) {
+		activeUsers(func: has(vehicle)) {
+			uid
 			name
 			password
 			role
 		  		vehicle {
+					uid
 					type
 					needsservice
 					latitude
@@ -115,19 +112,16 @@ func GetActiveUsers() (string, bool) {
 	res, err := txn.Query(ctx, q)
 
 	if err != nil {
-		error = true
 		log.Fatal(err)
 	}
 
-	return string(res.Json), error
+	return res.Json
 }
 
 // GetUser gets a user
-func GetUser(id string) (string, bool) {
+func GetUser(id string) []byte {
 
-	error := false
-
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -141,10 +135,12 @@ func GetUser(id string) (string, bool) {
 	variables := map[string]string{"$id": id}
 	q := `query getUser($id: string){
 		user(func: uid($id)){
+			uid
 			name
 			password
 			role
 		  		vehicle {
+					uid
 					type
 					needsservice
 					latitude
@@ -159,19 +155,16 @@ func GetUser(id string) (string, bool) {
 
 	res, err := dg.NewTxn().QueryWithVars(ctx, q, variables)
 	if err != nil || res == nil {
-		error = true
 		log.Fatal(err)
 	}
 
-	return string(res.Json), error
+	return res.Json
 }
 
 // CreateUser creates a user
-func CreateUser(u string) (string, bool) {
+func CreateUser(u []byte) []byte {
 
-	error := false
-
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -192,7 +185,7 @@ func CreateUser(u string) (string, bool) {
 
 	assigned, err := dg.NewTxn().Mutate(ctx, mu)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Print(err)
 	}
 
 	variables := map[string]string{"$id": assigned.Uids["user"]}
@@ -216,19 +209,16 @@ func CreateUser(u string) (string, bool) {
 
 	res, err := dg.NewTxn().QueryWithVars(ctx, q, variables)
 	if err != nil || res == nil {
-		error = true
-		log.Fatal(err)
+		fmt.Print(err)
 	}
 
-	return string(res.Json), error
+	return res.Json
 }
 
 // CreateConnectionBetweenVehicleAndUser connection between a user and a vehicle
-func CreateConnectionBetweenVehicleAndUser(vehicleID string, userID string) (string, bool) {
+func CreateConnectionBetweenVehicleAndUser(vehicleID string, userID string) []byte {
 
-	error := false
-
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -258,10 +248,12 @@ func CreateConnectionBetweenVehicleAndUser(vehicleID string, userID string) (str
 
 	q := `query getUser($id: string){
 		user(func: uid($id)){
+			uid
 			name
 			password
 			role
 		  		vehicle {
+					uid
 					type
 					needsservice
 					latitude
@@ -276,19 +268,16 @@ func CreateConnectionBetweenVehicleAndUser(vehicleID string, userID string) (str
 
 	res, err := dg.NewReadOnlyTxn().QueryWithVars(ctx, q, variables)
 	if err != nil {
-		error = true
 		log.Fatal(err)
 	}
 
-	return string(res.Json), error
+	return res.Json
 }
 
 // UpdateUser updates a user
-func UpdateUser(id string, u string) (string, bool) {
+func UpdateUser(id string, u []byte) []byte {
 
-	error := false
-
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -323,19 +312,16 @@ func UpdateUser(id string, u string) (string, bool) {
 
 	res, err := dg.NewReadOnlyTxn().QueryWithVars(ctx, q, variables)
 	if err != nil || res == nil {
-		error = true
 		log.Fatal(err)
 	}
 
-	return string(res.Json), error
+	return res.Json
 }
 
 // DeleteUser deletes a user
-func DeleteUser(id string) bool {
+func DeleteUser(id string) {
 
-	error := false
-
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -360,25 +346,19 @@ func DeleteUser(id string) bool {
 
 	res, err := dg.NewTxn().Mutate(ctx, mu)
 	if err != nil {
-		error = true
 		log.Fatal(err)
 	}
 
 	res, err = dg.NewTxn().QueryWithVars(ctx, q, variables)
 	if err != nil || res == nil {
-		error = true
 		log.Fatal(err)
 	}
-
-	return error
 }
 
 // DeleteConnectionBetweenUserAndVehicle deletes the connection between a user and a vehicle
-func DeleteConnectionBetweenUserAndVehicle(id string) bool {
+func DeleteConnectionBetweenUserAndVehicle(id string) {
 
-	error := false
-
-	conn, err := grpc.Dial("localhost:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -403,15 +383,11 @@ func DeleteConnectionBetweenUserAndVehicle(id string) bool {
 
 	res, err := dg.NewTxn().Mutate(ctx, mu)
 	if err != nil {
-		error = true
 		log.Fatal(err)
 	}
 
 	res, err = dg.NewTxn().QueryWithVars(ctx, q, variables)
 	if err != nil || res == nil {
-		error = true
 		log.Fatal(err)
 	}
-
-	return error
 }

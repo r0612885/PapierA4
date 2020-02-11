@@ -14,15 +14,15 @@ func GetUsersMessageHandler(payload map[string]interface{}, hash string, metadat
 
 	mapstructure.Decode(payload, &message)
 
-	users, err := userservice.GetUsers()
+	users := userservice.GetUsers()
 
 	var msg string
 
-	if err == true {
-		msg = "getting users failed"
-	} else{
-		msg = "Success"
-	}
+	// if err == true {
+	// 	msg = "getting users failed"
+	// } else{
+	// 	msg = "Success"
+	// }
 
 	fmt.Println(msg)
 

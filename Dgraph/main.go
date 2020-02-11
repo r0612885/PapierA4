@@ -1,187 +1,292 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 
-	// "fmt"
-
-	"github.com/r0612885/PapierA4/Dgraph/Events/handlers"
-	"github.com/r0612885/PapierA4/Dgraph/Events/mock"
-	"github.com/r0612885/PapierA4/Dgraph/Events/models"
-	// "github.com/r0612885/PapierA4/Dgraph/Services/authservice"
+	"github.com/gorilla/mux"
+	"github.com/r0612885/PapierA4/Dgraph/Services/userservice"
+	"github.com/r0612885/PapierA4/Dgraph/Services/vehicleservice"
 )
 
-func main() {
-	mockEvents := []models.Event{
+type User struct {
+	Uid     string  `json:"uid,omitempty"`
+	Name    string  `json:"name,omitempty"`
+	Role    string  `json:"role,omitempty"`
+	Vehicle Vehicle `json:"vehicle,omitempty"`
+}
 
-		// // USER EVENTS
+type Vehicle struct {
+	Uid          string  `json:"uid,omitempty"`
+	Type         string  `json:"type,omitempty"`
+	Latitude     float64 `json:"latitude,omitempty"`
+	Longitude    float64 `json:"longitude,omitempty"`
+	Needsservice bool    `json:"needsservice"`
+}
 
-		// models.Event{
-		// 	Topic:   "message",
-		// 	Action:  "getUsers",
-		// 	Payload: map[string]interface{}{},
-		// 	Hash:    "GetUsers",
-		// },
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "getUser",
-		// 	Payload: map[string]interface{}{
-		// 		"id": "0x5",
-		// 	},
-		// 	Hash: "GetUser",
-		// },
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "createUser",
-		// 	Payload: map[string]interface{}{
-		// 		"content": `{ "user": [{"uid": "_:user","name": "Sponge", "password": "snicker","role": "Admin"}]}`,
-		// 	},
-		// 	Hash: "CreateUser",
-		// },
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "createConnectionUserAndVehicle",
-		// 	Payload: map[string]interface{}{
-		// 		"id":      "0x3",
-		// 		"content": "0x68",
-		// 	},
-		// 	Hash: "CreateConnectionUserAndVehicle",
-		// },
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "updateUser",
-		// 	Payload: map[string]interface{}{
-		// 		"id":      "0x68",
-		// 		"content": `{ "user": [{"uid": "0x68","role": "test"}]}`,
-		// 	},
-		// 	Hash: "UpdateUser",
-		// },
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "deleteUser",
-		// 	Payload: map[string]interface{}{
-		// 		"id": "0x2d",
-		// 	},
-		// 	Hash: "DeleteUser",
-		// },
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "deleteConnectionUserAndVehicle",
-		// 	Payload: map[string]interface{}{
-		// 		"id": "0x5",
-		// 	},
-		// 	Hash: "DeleteConnectionUserAndVehicle",
-		// },
+////////////////////////////////
+/////////////user///////////////
+////////////////////////////////
 
-		// // VEHICLE EVENTS
+//get all the users
+func getUsers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-		// models.Event{
-		// 	Topic:   "message",
-		// 	Action:  "getVehicles",
-		// 	Payload: map[string]interface{}{},
-		// 	Hash:    "GetVehicles",
-		// },
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "getVehicle",
-		// 	Payload: map[string]interface{}{
-		// 		"id": "0x65",
-		// 	},
-		// 	Hash: "GetVehicle",
-		// },
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "createVehicle",
-		// 	Payload: map[string]interface{}{
-		// 		"content": `{ "vehicle": [{"uid": "_:vehicle","type": "Vrachtwagen ABC123","latitude": 415.2366,"longitude": 41.97791,"needsservice": false}]}`,
-		// 	},
-		// 	Hash: "CreateVehicle",
-		// },
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "updateVehicle",
-		// 	Payload: map[string]interface{}{
-		// 		"id":      "0x65",
-		// 		"content": `{ "vehicle": [{"uid": "0x65","type": "Vrachtwagen DEF456","needsservice": true}]}`,
-		// 	},
-		// 	Hash: "UpdateVehicle",
-		// },
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "deleteVehicle",
-		// 	Payload: map[string]interface{}{
-		// 		"id": "0x65",
-		// 	},
-		// 	Hash: "DeleteVehicle",
-		// },
+	users := userservice.GetUsers()
 
-		// SERVICE EVENTS
+	w.Write(users)
+}
 
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "createService",
-		// 	Payload: map[string]interface{}{
-		// 		"id":      "0x17",
-		// 		"content": `{"uid": "_:service","description": "Motorpech","datecompleted": "0"}`,
-		// 	},
-		// 	Hash: "CreateService",
-		// },
-		// models.Event{
-		// 	Topic:  "message",
-		// 	Action: "completeService",
-		// 	Payload: map[string]interface{}{
-		// 		"id":      "0x5f",
-		// 		"content": `{ "service": [{"uid": "0x5f","datecompleted": "` + strconv.Itoa(int(time.Now().Unix())) + `"}]}`,
-		// 	},
-		// 	Hash: "CompleteService",
-		// },
-		models.Event{
-			Topic:  "message",
-			Action: "getLastService",
-			Payload: map[string]interface{}{
-				"id": "0x17",
-			},
-			Hash: "GetLastService",
-		},
-	}
+//get all the active users
+func getActiveUsers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-	eventService := mock.EventService{
-		MockedQueue:  mockEvents,
-		EventChannel: make(chan models.Event),
-	}
+	users := userservice.GetActiveUsers()
 
-	// // USER SUBSCRIBES
+	w.Write(users)
+}
 
-	// eventService.Subscribe("message", "getUsers", handlers.GetUsersMessageHandler)
-	// eventService.Subscribe("message", "getUser", handlers.GetUserMessageHandler)
-	// eventService.Subscribe("message", "createUser", handlers.CreateUserMessageHandler)
-	// eventService.Subscribe("message", "createConnectionUserAndVehicle", handlers.CreateConnectionBetweenUserAndVehicleMessageHandler)
-	// eventService.Subscribe("message", "updateUser", handlers.UpdateUserMessageHandler)
-	// eventService.Subscribe("message", "deleteUser", handlers.DeleteUserMessageHandler)
-	// eventService.Subscribe("message", "deleteConnectionUserAndVehicle", handlers.DeleteConnectionBetweenUserAndVehicleMessageHandler)
+//get user -- pass userID
+func getUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
-	// // VEHICLE SUBSCRIBES
+	params := mux.Vars(r)
 
-	// eventService.Subscribe("message", "getVehicles", handlers.GetVehiclesMessageHandler)
-	// eventService.Subscribe("message", "getVehicle", handlers.GetVehicleMessageHandler)
-	// eventService.Subscribe("message", "createVehicle", handlers.CreateVehicleMessageHandler)
-	// eventService.Subscribe("message", "updateVehicle", handlers.UpdateVehicleMessageHandler)
-	// eventService.Subscribe("message", "deleteVehicle", handlers.DeleteVehicleMessageHandler)
+	users := userservice.GetUser(params["id"])
 
-	// SERVICE SUBSCRIBES
+	w.Write(users)
+}
 
-	// eventService.Subscribe("message", "createService", handlers.CreateServiceMessageHandler)
-	// eventService.Subscribe("message", "completeService", handlers.CompleteServiceMessageHandler)
-	eventService.Subscribe("message", "getLastService", handlers.GetTimeSinceLastServiceMessageHandler)
+//create new user
+func createUser(w http.ResponseWriter, r *http.Request) {
 
-	err := eventService.ListenForEvents()
-
+	// Read body
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
 	if err != nil {
-		fmt.Println(err)
+		http.Error(w, err.Error(), 500)
+		return
 	}
 
-	// content := `{"username":"test","password": "test123"}`
+	// Unmarshal
+	var msg User
+	err = json.Unmarshal(b, &msg)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 
-	// token := authservice.Login(content)
-	// fmt.Println(token)
+	output, err := json.Marshal(msg)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	w.Header().Set("content-type", "application/json")
+
+	userservice.CreateUser(output)
+
+	fmt.Print(output)
+	w.Write(output)
+}
+
+//create a new connecten between vehicle and user
+func createConnectionBetweenVehicleAndUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+
+	users := userservice.CreateConnectionBetweenVehicleAndUser(params["vehicleID"], params["userID"])
+
+	w.Write(users)
+}
+
+//update the user -- pass userID with the new data
+func updateUser(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	// Read body
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Unmarshal
+	var msg User
+	err = json.Unmarshal(b, &msg)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	output, err := json.Marshal(msg)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	w.Header().Set("content-type", "application/json")
+
+	userservice.UpdateUser(params["id"], output)
+
+	fmt.Print(output)
+	w.Write(output)
+}
+
+//delete user -- pass userID
+func deleteUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+
+	userservice.DeleteUser(params["id"])
+}
+
+//delete connection between user and vehicle -- pass the userID
+func deleteConnectionBetweenUserAndVehicle(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+
+	userservice.DeleteConnectionBetweenUserAndVehicle(params["id"])
+}
+
+////////////////////////////////
+/////////////vehicles///////////
+////////////////////////////////
+
+//get all the vehicles
+func getVehicles(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	vehicles := vehicleservice.GetVehicles()
+
+	w.Write(vehicles)
+}
+
+// //get all the active vehicles
+// func getActiveVehicles(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content-Type", "application/json")
+
+// 	vehicles := vehicleservice.GetActiveVehicles()
+
+// 	fmt.Println("request get users")
+
+// 	w.Write(vehicles)
+// }
+
+//get vehicle -- pass vehicleID
+func getVehicle(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+
+	vehicle := vehicleservice.GetVehicle(params["id"])
+
+	w.Write(vehicle)
+}
+
+//create the vehicle -- pass the data
+func createVehicle(w http.ResponseWriter, r *http.Request) {
+
+	// Read body
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Unmarshal
+	var msg Vehicle
+	err = json.Unmarshal(b, &msg)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	output, err := json.Marshal(msg)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	w.Header().Set("content-type", "application/json")
+
+	vehicleservice.CreateVehicle(output)
+
+	w.Write(output)
+}
+
+//update the vehicle -- pass vehicleID with the new data
+func updateVehicle(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	// Read body
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Unmarshal
+	var msg Vehicle
+	err = json.Unmarshal(b, &msg)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	output, err := json.Marshal(msg)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	w.Header().Set("content-type", "application/json")
+
+	vehicleservice.UpdateVehicle(params["id"], output)
+
+	w.Write(output)
+}
+
+//delete vehicle -- pass vehicleID
+func deleteVehicle(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+
+	vehicleservice.DeleteVehicle(params["id"])
+}
+
+func main() {
+	r := mux.NewRouter()
+
+	////////////
+	//user api//
+	////////////
+	r.HandleFunc("/user/all", getUsers).Methods("GET")
+	r.HandleFunc("/user/active", getActiveUsers).Methods("GET")
+	r.HandleFunc("/user/get/{id}", getUser).Methods("GET")
+	r.HandleFunc("/user/create", createUser).Methods("POST")
+	r.HandleFunc("/user/createconnectionvehicle/{vehicleID}/{userID}", createConnectionBetweenVehicleAndUser).Methods("PUT")
+	r.HandleFunc("/user/update/{id}", updateUser).Methods("PUT")
+	r.HandleFunc("/user/delete/{id}", deleteUser).Methods("DELETE")
+	r.HandleFunc("/user/deleteconnectionvehicle/{id}", deleteConnectionBetweenUserAndVehicle).Methods("DELETE")
+
+	///////////////
+	//vehicle api//
+	///////////////
+	r.HandleFunc("/vehicle/all", getVehicles).Methods("GET")
+	// r.HandleFunc("/vehicle/getallactive", getActiveVehicles).Methods("GET")
+	r.HandleFunc("/vehicle/get/{id}", getVehicle).Methods("GET")
+	r.HandleFunc("/vehicle/create", createVehicle).Methods("POST")
+	r.HandleFunc("/vehicle/update/{id}", updateVehicle).Methods("PUT")
+	r.HandleFunc("/vehicle/delete/{id}", deleteVehicle).Methods("DELETE")
+
+	log.Fatal(http.ListenAndServe(":8001", r))
 }
