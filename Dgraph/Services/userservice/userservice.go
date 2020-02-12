@@ -16,7 +16,7 @@ type Vehicle struct {
 	Type         string  `json:"type,omitempty"`
 	Latitude     float64 `json:"latitude,omitempty"`
 	Longitude    float64 `json:"longitude,omitempty"`
-	Needsservice bool    `json:"needsservice"`
+	Needsservice bool    `json:"needsservice,omitempty"`
 }
 
 type User struct {
