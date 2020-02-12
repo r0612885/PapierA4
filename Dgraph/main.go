@@ -273,10 +273,12 @@ func main() {
 	r.HandleFunc("/user/active", getActiveUsers).Methods("GET")
 	r.HandleFunc("/user/get/{id}", getUser).Methods("GET")
 	r.HandleFunc("/user/create", createUser).Methods("POST")
-	r.HandleFunc("/user/createconnectionvehicle/{vehicleID}/{userID}", createConnectionBetweenVehicleAndUser).Methods("PUT")
+	//pass vehicleID -- userID
+	r.HandleFunc("/connection/create/{vehicleID}/{userID}", createConnectionBetweenVehicleAndUser).Methods("PUT")
 	r.HandleFunc("/user/update/{id}", updateUser).Methods("PUT")
 	r.HandleFunc("/user/delete/{id}", deleteUser).Methods("DELETE")
-	r.HandleFunc("/user/deleteconnectionvehicle/{id}", deleteConnectionBetweenUserAndVehicle).Methods("DELETE")
+	//pass userID
+	r.HandleFunc("/connection/delete/{id}", deleteConnectionBetweenUserAndVehicle).Methods("DELETE")
 
 	///////////////
 	//vehicle api//
