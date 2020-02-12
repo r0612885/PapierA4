@@ -20,10 +20,13 @@ type Vehicle struct {
 }
 
 type User struct {
-	Uid     string  `json:"uid,omitempty"`
-	Name    string  `json:"name,omitempty"`
-	Role    string  `json:"role,omitempty"`
-	Vehicle Vehicle `json:"vehicle,omitempty"`
+	Uid       string  `json:"uid,omitempty"`
+	Firstname string  `json:"firstname,omitempty"`
+	Lastname  string  `json:"lastname,omitempty"`
+	Email     string  `json:"email,omitempty"`
+	Password  string  `json:"password,omitempty"`
+	Role      string  `json:"role,omitempty"`
+	Vehicle   Vehicle `json:"vehicle,omitempty"`
 }
 
 // GetUsers gets all users
@@ -45,9 +48,11 @@ func GetUsers() []byte {
 
 	q := `
 	{
-		users(func: has(name)) {
+		users(func: has(firstname)) {
 	      uid
-		  name
+		  firstname
+		  lastname
+		  email
 		  role
 		  vehicle {
 			  type
@@ -92,8 +97,9 @@ func GetActiveUsers() []byte {
 	{
 		activeUsers(func: has(vehicle)) {
 			uid
-			name
-			password
+			firstname
+			lastname
+			email
 			role
 		  		vehicle {
 					uid
@@ -136,8 +142,9 @@ func GetUser(id string) []byte {
 	q := `query getUser($id: string){
 		user(func: uid($id)){
 			uid
-			name
-			password
+			firstname
+			lastname
+			email
 			role
 		  		vehicle {
 					uid
@@ -191,8 +198,9 @@ func CreateUser(u []byte) []byte {
 	variables := map[string]string{"$id": assigned.Uids["user"]}
 	q := `query getUser($id: string){
 		user(func: uid($id)){
-			name
-			password
+			firstname
+			lastname
+			email
 			role
 		  		vehicle {
 					type
@@ -249,8 +257,8 @@ func CreateConnectionBetweenVehicleAndUser(vehicleID string, userID string) []by
 	q := `query getUser($id: string){
 		user(func: uid($id)){
 			uid
-			name
-			password
+			firstname
+			lastname
 			role
 		  		vehicle {
 					uid
@@ -304,8 +312,8 @@ func UpdateUser(id string, u []byte) []byte {
 	variables := map[string]string{"$id": id}
 	q := `query getUser($id: string){
 		user(func: uid($id)){
-			name
-			password
+			firstname
+			lastname
 			role
 		}
 	}`
@@ -335,8 +343,9 @@ func DeleteUser(id string) {
 	variables := map[string]string{"$id": id}
 	q := `query getUser($id: string){
 		user(func: uid($id)){
-			name
-			password
+			firstname
+			lastname
+			email
 			role
 		}
 	}`
@@ -372,8 +381,9 @@ func DeleteConnectionBetweenUserAndVehicle(id string) {
 	variables := map[string]string{"$id": id}
 	q := `query getUser($id: string){
 		user(func: uid($id)){
-			name
-			password
+			firstname
+			lastname
+			email
 			role
 		}
 	}`
@@ -390,4 +400,52 @@ func DeleteConnectionBetweenUserAndVehicle(id string) {
 	if err != nil || res == nil {
 		log.Fatal(err)
 	}
+}
+
+///////////////////////
+////authentication/////
+///////////////////////
+
+func Authenticate(email string, password string) []byte {
+
+	conn, err := grpc.Dial("192.168.99.100:9080", grpc.WithInsecure())
+	if err != nil {
+		log.Fatal("While trying to dial gRPC")
+	}
+	defer conn.Close()
+
+	dc := api.NewDgraphClient(conn)
+	dg := dgo.NewDgraphClient(dc)
+
+	ctx := context.Background()
+
+	variables := map[string]string{"$email": email, "$password": password}
+	q := `query getUser($email : string, $password : string) {
+		user(func: eq(email, $email)) @filter(eq(password, $password)){
+			uid
+			firstname
+			lastname
+			email
+			password
+			role
+		  		vehicle {
+					uid
+					type
+					needsservice
+					latitude
+					longitude
+						service {
+							dateCompleted
+							description
+						}
+				  }
+			}
+		}`
+
+	res, err := dg.NewTxn().QueryWithVars(ctx, q, variables)
+	if err != nil || res == nil {
+		log.Fatal(err)
+	}
+
+	return res.Json
 }

@@ -13,10 +13,13 @@ import (
 )
 
 type User struct {
-	Uid     string  `json:"uid,omitempty"`
-	Name    string  `json:"name,omitempty"`
-	Role    string  `json:"role,omitempty"`
-	Vehicle Vehicle `json:"vehicle,omitempty"`
+	Uid       string  `json:"uid,omitempty"`
+	Firstname string  `json:"firstname,omitempty"`
+	Lastname  string  `json:"lastname,omitempty"`
+	Email     string  `json:"email,omitempty"`
+	Password  string  `json:"password,omitempty"`
+	Role      string  `json:"role,omitempty"`
+	Vehicle   Vehicle `json:"vehicle,omitempty"`
 }
 
 type Vehicle struct {
@@ -155,6 +158,20 @@ func deleteConnectionBetweenUserAndVehicle(w http.ResponseWriter, r *http.Reques
 	userservice.DeleteConnectionBetweenUserAndVehicle(params["id"])
 }
 
+//delete vehicle -- pass vehicleID
+func authenticate(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+
+	fmt.Print(params["email"])
+	fmt.Print(params["password"])
+
+	user := userservice.Authenticate(params["email"], params["password"])
+
+	w.Write(user)
+}
+
 ////////////////////////////////
 /////////////vehicles///////////
 ////////////////////////////////
@@ -279,6 +296,7 @@ func main() {
 	r.HandleFunc("/user/delete/{id}", deleteUser).Methods("DELETE")
 	//pass userID
 	r.HandleFunc("/connection/delete/{id}", deleteConnectionBetweenUserAndVehicle).Methods("DELETE")
+	r.HandleFunc("/user/authenticate/{email}/{password}", authenticate).Methods("GET")
 
 	///////////////
 	//vehicle api//
