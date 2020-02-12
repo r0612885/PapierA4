@@ -23,11 +23,11 @@ type User struct {
 }
 
 type Vehicle struct {
-	Uid          string  `json:"uid,omitempty"`
-	Type         string  `json:"type,omitempty"`
-	Latitude     float64 `json:"latitude,omitempty"`
-	Longitude    float64 `json:"longitude,omitempty"`
-	Needsservice bool    `json:"needsservice,omitempty"`
+	Uid          string `json:"uid,omitempty"`
+	Type         string `json:"type,omitempty"`
+	Latitude     string `json:"latitude,omitempty"`
+	Longitude    string `json:"longitude,omitempty"`
+	Needsservice bool   `json:"needsservice,omitempty"`
 }
 
 ////////////////////////////////
@@ -39,6 +39,8 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	users := userservice.GetUsers()
+
+	//location := locationservice.GetLastLocationOfUser()
 
 	w.Write(users)
 }
@@ -307,6 +309,7 @@ func main() {
 	r.HandleFunc("/vehicle/create", createVehicle).Methods("POST")
 	r.HandleFunc("/vehicle/update/{id}", updateVehicle).Methods("PUT")
 	r.HandleFunc("/vehicle/delete/{id}", deleteVehicle).Methods("DELETE")
+	r.HandleFunc("/vehicle/location/{id}", updateVehicle).Methods("PUT")
 
 	log.Fatal(http.ListenAndServe(":8001", r))
 }
