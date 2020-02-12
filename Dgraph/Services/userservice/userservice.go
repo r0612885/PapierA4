@@ -426,7 +426,6 @@ func Authenticate(email string, password string) []byte {
 			firstname
 			lastname
 			email
-			password
 			role
 		  		vehicle {
 					uid
