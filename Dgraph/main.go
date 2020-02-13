@@ -25,7 +25,7 @@ type User struct {
 type Vehicle struct {
 	Uid          string `json:"uid,omitempty"`
 	Type         string `json:"type,omitempty"`
-	Latitude     string `json:"latitude,omitempty"`
+	Latitude     string `json:"latitude,cd "`
 	Longitude    string `json:"longitude,omitempty"`
 	Needsservice bool   `json:"needsservice,omitempty"`
 }
