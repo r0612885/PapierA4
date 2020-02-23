@@ -15,7 +15,7 @@ type Vehicle struct {
 	Type         string `json:"type,omitempty"`
 	Latitude     string `json:"latitude,omitempty"`
 	Longitude    string `json:"longitude,omitempty"`
-	Needsservice bool   `json:"needsservice"`
+	Needsservice string `json:"needsservice,omitempty"`
 }
 
 // GetVehicles gets all vehicles

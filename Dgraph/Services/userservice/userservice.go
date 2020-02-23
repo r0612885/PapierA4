@@ -16,7 +16,7 @@ type Vehicle struct {
 	Type         string `json:"type,omitempty"`
 	Latitude     string `json:"latitude,omitempty"`
 	Longitude    string `json:"longitude,omitempty"`
-	Needsservice bool   `json:"needsservice,omitempty"`
+	Needsservice string `json:"needsservice,omitempty"`
 }
 
 type User struct {
@@ -351,7 +351,7 @@ func DeleteUser(id string) {
 	}`
 
 	mu := &api.Mutation{CommitNow: true}
-	dgo.DeleteEdges(mu, id, "name", "role", "vehicle")
+	dgo.DeleteEdges(mu, id, "firstname", "lastname", "email", "role", "password", "vehicle")
 
 	res, err := dg.NewTxn().Mutate(ctx, mu)
 	if err != nil {
