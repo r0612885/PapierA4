@@ -32,7 +32,7 @@ type User struct {
 // GetUsers gets all users
 func GetUsers() []byte {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -79,7 +79,7 @@ func GetUsers() []byte {
 // GetActiveUsers gets all users who are currently operating a vehicle
 func GetActiveUsers() []byte {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -127,7 +127,7 @@ func GetActiveUsers() []byte {
 // GetUser gets a user
 func GetUser(id string) []byte {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -171,7 +171,7 @@ func GetUser(id string) []byte {
 // CreateUser creates a user
 func CreateUser(u []byte) []byte {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -226,7 +226,7 @@ func CreateUser(u []byte) []byte {
 // CreateConnectionBetweenVehicleAndUser connection between a user and a vehicle
 func CreateConnectionBetweenVehicleAndUser(vehicleID string, userID string) []byte {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -285,7 +285,7 @@ func CreateConnectionBetweenVehicleAndUser(vehicleID string, userID string) []by
 // UpdateUser updates a user
 func UpdateUser(id string, u []byte) []byte {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -329,7 +329,7 @@ func UpdateUser(id string, u []byte) []byte {
 // DeleteUser deletes a user
 func DeleteUser(id string) {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -367,7 +367,7 @@ func DeleteUser(id string) {
 // DeleteConnectionBetweenUserAndVehicle deletes the connection between a user and a vehicle
 func DeleteConnectionBetweenUserAndVehicle(id string) {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -408,7 +408,7 @@ func DeleteConnectionBetweenUserAndVehicle(id string) {
 
 func Authenticate(email string, password string) []byte {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
