@@ -11,7 +11,7 @@ import (
 	"github.com/r0612885/PapierA4/Dgraph/Services/userservice"
 	"github.com/r0612885/PapierA4/Dgraph/Services/vehicleservice"
 )
-
+//commit
 type User struct {
 	Uid       string  `json:"uid,omitempty"`
 	Firstname string  `json:"firstname,omitempty"`
