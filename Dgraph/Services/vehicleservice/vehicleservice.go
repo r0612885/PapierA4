@@ -21,7 +21,7 @@ type Vehicle struct {
 // GetVehicles gets all vehicles
 func GetVehicles() []byte {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -62,7 +62,7 @@ func GetVehicles() []byte {
 // GetVehicle gets a vehicle
 func GetVehicle(id string) []byte {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -99,7 +99,7 @@ func GetVehicle(id string) []byte {
 // CreateVehicle creates a vehicle
 func CreateVehicle(v []byte) []byte {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -148,7 +148,7 @@ func CreateVehicle(v []byte) []byte {
 // UpdateVehicle updates a vehicle
 func UpdateVehicle(id string, v []byte) []byte {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
@@ -193,7 +193,7 @@ func UpdateVehicle(id string, v []byte) []byte {
 // DeleteVehicle deletes a vehicle
 func DeleteVehicle(id string) {
 
-	conn, err := grpc.Dial("10.244.1.9:9080", grpc.WithInsecure())
+	conn, err := grpc.Dial("10.244.1.10:9080", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("While trying to dial gRPC")
 	}
